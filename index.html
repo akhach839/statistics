@@ -15,7 +15,6 @@ body {
   color: #111827;
 }
 
-/* HEADER */
 header {
   text-align: center;
   padding: 20px;
@@ -28,7 +27,6 @@ header img {
   max-width: 100%;
 }
 
-/* CONTAINER */
 .container {
   width: 1200px;
   margin: auto;
@@ -56,10 +54,6 @@ header img {
   font-size: 13px;
   color: #6b7280;
   margin: 0;
-}
-
-.dash-card h3 {
-  margin-top: 8px;
 }
 
 .highlight {
@@ -98,6 +92,31 @@ header img {
   border-radius: 4px;
 }
 
+/* DEAL TABLE */
+.deal-section {
+  margin-top: 40px;
+}
+
+.deal-header, .deal-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  padding: 12px;
+  font-size: 14px;
+}
+
+.deal-header {
+  font-weight: 600;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.deal-row {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.deal-row:nth-child(even) {
+  background: #f9fafb;
+}
+
 /* GRID */
 .grid {
   display: flex;
@@ -105,7 +124,6 @@ header img {
   flex-wrap: wrap;
 }
 
-/* CARDS */
 .card {
   flex: 1 1 calc(25% - 25px);
   background: white;
@@ -127,7 +145,7 @@ header img {
   object-fit: cover;
 }
 
-/* MOBILE SQUARE FIX */
+/* MOBILE */
 @media (max-width: 768px) {
   .image-box {
     aspect-ratio: 1 / 1;
@@ -138,24 +156,16 @@ header img {
     object-fit: contain;
   }
 
-  .container {
-    width: 95%;
-  }
-
-  .card {
-    flex: 1 1 100%;
-  }
-
-  .dashboard-grid {
+  .container { width: 95%; }
+  .card { flex: 1 1 100%; }
+  .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+  .charts { grid-template-columns: 1fr; }
+  .deal-header, .deal-row {
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .charts {
-    grid-template-columns: 1fr;
+    gap: 5px;
   }
 }
 
-/* CONTENT */
 .content {
   padding: 15px;
 }
@@ -169,7 +179,6 @@ header img {
 .green { color: #16a34a; }
 .rate { color: #2563eb; }
 
-/* CONTACT */
 .contact {
   margin-top: 50px;
   padding: 30px;
@@ -218,6 +227,21 @@ header img {
   </div>
 </div>
 
+<!-- DEAL TABLE -->
+<div class="deal-section">
+  <h2>Acquisition Breakdown</h2>
+
+  <div class="deal-header">
+    <div>Property</div>
+    <div>Cash In</div>
+    <div>Year</div>
+    <div>Value</div>
+    <div>Debt</div>
+  </div>
+
+  <div id="dealTable"></div>
+</div>
+
 <!-- PROPERTIES -->
 <div class="grid">
 
@@ -251,7 +275,7 @@ header img {
 </div>
 
 <div class="card">
-  <div class="image-box"><img src="./aurorahouse.png"></div>
+  <div class="image-box"><img src="./aurora-house.png"></div>
   <div class="content">
     <h3>Aurora House</h3>
     <div class="row"><span>Rent</span><span class="green">$2,600</span></div>
@@ -271,48 +295,67 @@ header img {
 </div>
 
 <script>
+// FULL DATA
 const properties = [
-  { value: 330000, debt: 170000, invested: 45000, cashflow: 900 },
-  { value: 310000, debt: 200000, invested: 90000, cashflow: 800 },
-  { value: 150000, debt: 0, invested: 28000, cashflow: 870 },
-  { value: 450000, debt: 0, invested: 36000, cashflow: 2300 }
+  { name:"Aurora Condo", value:330000, debt:170000, invested:45000, cashflow:900, year:2018 },
+  { name:"Denton", value:310000, debt:200000, invested:90000, cashflow:800, year:2025 },
+  { name:"Denver Condo", value:150000, debt:0, invested:28000, cashflow:870, year:2012 },
+  { name:"Aurora House", value:450000, debt:0, invested:36000, cashflow:2300, year:2012 }
 ];
 
-let totalValue = 0, totalDebt = 0, totalInvested = 0, totalCashflow = 0;
+let totalValue=0,totalDebt=0,totalInvested=0,totalCashflow=0;
 
-properties.forEach(p => {
-  totalValue += p.value;
-  totalDebt += p.debt;
-  totalInvested += p.invested;
-  totalCashflow += p.cashflow;
+properties.forEach(p=>{
+  totalValue+=p.value;
+  totalDebt+=p.debt;
+  totalInvested+=p.invested;
+  totalCashflow+=p.cashflow;
 });
 
-let equity = totalValue - totalDebt;
-let roi = ((equity - totalInvested) / totalInvested) * 100;
+let equity=totalValue-totalDebt;
+let roi=((equity-totalInvested)/totalInvested)*100;
 
-const format = n => "$" + n.toLocaleString();
+const format=n=>"$"+n.toLocaleString();
 
-document.getElementById("value").innerText = format(totalValue);
-document.getElementById("debt").innerText = format(totalDebt);
-document.getElementById("invested").innerText = format(totalInvested);
-document.getElementById("equity").innerText = format(equity);
-document.getElementById("cashflow").innerText = format(totalCashflow) + "/mo";
-document.getElementById("roi").innerText = Math.round(roi) + "%";
+document.getElementById("value").innerText=format(totalValue);
+document.getElementById("debt").innerText=format(totalDebt);
+document.getElementById("invested").innerText=format(totalInvested);
+document.getElementById("equity").innerText=format(equity);
+document.getElementById("cashflow").innerText=format(totalCashflow)+"/mo";
+document.getElementById("roi").innerText=Math.round(roi)+"%";
 
-let equityPercent = (equity / totalValue) * 100;
-let debtPercent = (totalDebt / totalValue) * 100;
+let equityPercent=(equity/totalValue)*100;
+let debtPercent=(totalDebt/totalValue)*100;
 
-document.getElementById("equityBar").style.width = equityPercent + "%";
-document.getElementById("debtBar").style.width = debtPercent + "%";
+document.getElementById("equityBar").style.width=equityPercent+"%";
+document.getElementById("debtBar").style.width=debtPercent+"%";
 
-const colors = ["#16a34a","#2563eb","#f59e0b","#ef4444"];
-const breakdown = document.getElementById("breakdown");
+const colors=["#16a34a","#2563eb","#f59e0b","#ef4444"];
+const breakdown=document.getElementById("breakdown");
 
 properties.forEach((p,i)=>{
-  let div = document.createElement("div");
-  div.style.width = (p.value/totalValue)*100 + "%";
-  div.style.background = colors[i];
+  let div=document.createElement("div");
+  div.style.width=(p.value/totalValue)*100+"%";
+  div.style.background=colors[i];
   breakdown.appendChild(div);
+});
+
+// DEAL TABLE
+const table=document.getElementById("dealTable");
+
+properties.forEach(p=>{
+  const row=document.createElement("div");
+  row.className="deal-row";
+
+  row.innerHTML=`
+    <div>${p.name}</div>
+    <div>${format(p.invested)}</div>
+    <div>${p.year}</div>
+    <div>${format(p.value)}</div>
+    <div>${format(p.debt)}</div>
+  `;
+
+  table.appendChild(row);
 });
 </script>
 
